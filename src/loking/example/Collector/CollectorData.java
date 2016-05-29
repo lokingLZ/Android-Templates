@@ -9,7 +9,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -41,7 +40,7 @@ public class CollectorData {
 		this.mContext = context;
 		this.dataFileName = dataFileName;
 		this.dataIOmode = MODE;
-		Log.e(TAG, getClass().getSimpleName()+" CollectorData");
+		Log.e(TAG, "CollectorData instantiate");
 	}
 	
 	public void saveSharedPreferencesData(HashMap<String, Object> dataMap, String[] items){
@@ -51,7 +50,7 @@ public class CollectorData {
 			mSPeditor.putString(items[i], dataMap.get(items[i]).toString());
 		}
 		mSPeditor.commit();
-		Log.e(TAG, getClass().getSimpleName()+" saveSharedPreferencesData");
+		Log.e(TAG, "saveSharedPreferencesData succeeded");
 	}
 	
 	public HashMap<String, Object> getSharedPreferencesData(String[] items){
@@ -60,7 +59,7 @@ public class CollectorData {
 			String sTemp = mSharedPreferences.getString(items[i], null);
 			dataMap.put(items[i], sTemp);
 		}
-		Log.e(TAG, getClass().getSimpleName()+" getSharedPreferencesData");
+		Log.e(TAG, "getSharedPreferencesData succeeded");
 		return dataMap;
 	}
 	
@@ -80,7 +79,7 @@ public class CollectorData {
 				e.printStackTrace();
 			}
 		}
-		Log.e(TAG, getClass().getSimpleName()+" saveIOdata");
+		Log.e(TAG, "saveIOdata succeeded");
 	}
 	
 	public String loadIOdata() {
@@ -102,14 +101,14 @@ public class CollectorData {
 				}
 			}
 		}
-		Log.e(TAG, getClass().getSimpleName()+" loadIOdata");
+		Log.e(TAG, "loadIOdata succeeded");
 		return content.toString();
 	}
 	
 	protected void createDatabases(int version, String create, String upgrade){
 		mDatabaseHelper = new DatabaseHelper(mContext, dataFileName, null, version);
 		mSQLiteDatabase = mDatabaseHelper.getWritableDatabase();
-		Log.e(TAG, getClass().getSimpleName()+" createDatabases");
+		Log.e(TAG, "createDatabases succeeded");
 	}
 	
 	protected void dbExecSQL(String sql){
@@ -205,7 +204,6 @@ class DatabaseHelper extends SQLiteOpenHelper {
 	public void onCreate(SQLiteDatabase db) {
 		db.execSQL(CREATE_BOOK);
 		db.execSQL(CREATE_CATEGORY);
-		Toast.makeText(mContext, "Create succeeded", Toast.LENGTH_SHORT).show();
 	}
 
 	@Override
