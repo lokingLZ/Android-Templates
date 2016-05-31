@@ -1,1 +1,53 @@
-
+CollectorData
+  public void createDatabases(int version)
+    创建数据库
+    输入：version 版本号
+    返回：无
+  public ArrayList<HashMap<String,Object>> queryDatabasesData(String tableName, String where, String items[])
+    数据库查询
+    输入：tableName 数据库表名，筛选条件 where，返回项目 items
+    返回：ArrayList<HashMap<String,Object>>类型的Map数组
+  public long deleteDatabasesData(String tableName, String where)
+    数据库删除
+    输入：tableName 数据库表名，筛选条件 where
+    返回：影响的数据库行数
+  public long addDatabasesData(String tableName, ContentValues values)
+    数据库添加
+    输入：tableName 数据库表名，ContentValues 类型数据集
+    返回：影响的数据库行数
+  public long updataDatabasesData(String tableName, ContentValues values, String where)
+    数据库更新
+    输入：tableName 数据库表名，ContentValues 类型数据集，筛选条件 where
+    返回：影响的数据库行数
+  public ArrayList<HashMap<String,Object>> dbRawQuery(String sql, String items[])
+    执行数据库sql语句查询
+    输入：sql 查询语句，返回项目 items
+    返回：ArrayList<HashMap<String,Object>>类型的Map数组
+  public void dbExecSQL(String sql)
+    执行数据库sql语句
+    输入：sql sql语句
+    返回：无
+  public String loadIOdata()
+    获取普通文件数据
+    输入：无
+    返回：字符串
+  public void saveIOdata(Object inputText)
+    保存普通文件数据
+    输入：inputText 要保存的文本
+    返回：无
+  public void saveSharedPreferencesData(HashMap<String, Object> dataMap, String[] items)
+    保存SharedPreferences文件数据
+    输入：dataMap 要保存的数据，items 保存数据的key
+    返回：无
+  public HashMap<String, Object> getSharedPreferencesData(String[] items)
+    获取SharedPreferences文件数据
+    输入：items 数据的key
+    返回：HashMap
+  public SQLiteDatabase getmSQLiteDatabase()
+    获取数据库对象
+    输入：无
+    返回：数据库对象
+  public CollectorData(Context context, String dataFileName, int MODE)
+    构造方法
+    输入：context 上下文对象，dataFileName 文件／数据库名，MODE 文件读写类型
+    返回：无
