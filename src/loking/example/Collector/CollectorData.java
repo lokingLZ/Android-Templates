@@ -9,7 +9,6 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -18,10 +17,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
-import android.widget.Toast;
 
 public class CollectorData {
-	private static String TAG = "CollectorData";
+	private final static String TAG = "CollectorData";
 	private SharedPreferences mSharedPreferences;
 	private SharedPreferences.Editor mSPeditor;
 	private DatabaseHelper mDatabaseHelper;
@@ -36,14 +34,18 @@ public class CollectorData {
 	private FileInputStream in = null;
 	private BufferedReader reader = null;
 	private ArrayList<HashMap<String, Object>> queryMap;
-	
+
+	public SQLiteDatabase getmSQLiteDatabase() {
+		return mSQLiteDatabase;
+	}
+
 	public CollectorData(Context context, String dataFileName, int MODE){
 		this.mContext = context;
 		this.dataFileName = dataFileName;
 		this.dataIOmode = MODE;
-		Log.e(TAG, getClass().getSimpleName()+" CollectorData");
+		Log.e(TAG, "CollectorData create succeeded");
 	}
-	
+
 	public void saveSharedPreferencesData(HashMap<String, Object> dataMap, String[] items){
 		mSharedPreferences = mContext.getSharedPreferences(dataFileName, dataIOmode);
 		mSPeditor = mSharedPreferences.edit();
@@ -51,19 +53,19 @@ public class CollectorData {
 			mSPeditor.putString(items[i], dataMap.get(items[i]).toString());
 		}
 		mSPeditor.commit();
-		Log.e(TAG, getClass().getSimpleName()+" saveSharedPreferencesData");
+		Log.e(TAG, "saveSharedPreferencesData succeeded");
 	}
-	
+
 	public HashMap<String, Object> getSharedPreferencesData(String[] items){
 		dataMap = new HashMap<String, Object>();
 		for(int i=0; i<items.length; i++){
 			String sTemp = mSharedPreferences.getString(items[i], null);
 			dataMap.put(items[i], sTemp);
 		}
-		Log.e(TAG, getClass().getSimpleName()+" getSharedPreferencesData");
+		Log.e(TAG, "getSharedPreferencesData succeeded");
 		return dataMap;
 	}
-	
+
 	public void saveIOdata(Object inputText) {
 		try {
 			out = mContext.openFileOutput(dataFileName, dataIOmode);
@@ -80,9 +82,9 @@ public class CollectorData {
 				e.printStackTrace();
 			}
 		}
-		Log.e(TAG, getClass().getSimpleName()+" saveIOdata");
+		Log.e(TAG, "saveIOdata succeeded");
 	}
-	
+
 	public String loadIOdata() {
 		StringBuilder content = new StringBuilder();
 		try {
@@ -102,51 +104,68 @@ public class CollectorData {
 				}
 			}
 		}
-		Log.e(TAG, getClass().getSimpleName()+" loadIOdata");
+		Log.e(TAG, "loadIOdata succeeded");
 		return content.toString();
 	}
-	
-	protected void createDatabases(int version, String create, String upgrade){
+
+	public void createDatabases(int version){
 		mDatabaseHelper = new DatabaseHelper(mContext, dataFileName, null, version);
 		mSQLiteDatabase = mDatabaseHelper.getWritableDatabase();
-		Log.e(TAG, getClass().getSimpleName()+" createDatabases");
+		mSQLiteDatabase.close();
+		Log.e(TAG, "createDatabases succeeded");
 	}
-	
-	protected void dbExecSQL(String sql){
+
+	public void dbExecSQL(String sql){
+		mSQLiteDatabase = mDatabaseHelper.getWritableDatabase();
 		mSQLiteDatabase.execSQL(sql);
+		mSQLiteDatabase.close();
+		Log.e(TAG, "dbExecSQL succeeded");
 	}
-	
-	protected ArrayList<HashMap<String,Object>> dbRawQuery(String sql, String items[]){
+
+	public ArrayList<HashMap<String,Object>> dbRawQuery(String sql, String items[]){
+		mSQLiteDatabase = mDatabaseHelper.getWritableDatabase();
 		Cursor cursor = mSQLiteDatabase.rawQuery(sql, null);
-		return outCursor(cursor, items);
+		mSQLiteDatabase.close();
+		Log.e(TAG, "dbRawQuery succeeded");
+		return outCursor(mSQLiteDatabase, cursor, items);
 	}
-	
-	protected long addDatabasesData(String tableName, ContentValues values) {
+
+	public long addDatabasesData(String tableName, ContentValues values) {
+		mSQLiteDatabase = mDatabaseHelper.getWritableDatabase();
 		changeItemNum = mSQLiteDatabase.insert(tableName, null, values);
+		mSQLiteDatabase.close();
+		Log.e(TAG, "addDatabasesData succeeded");
 		return changeItemNum;
 	}
 
-	protected long updataDatabasesData(String tableName, ContentValues values, String where, String items[]) {
-		changeItemNum = mSQLiteDatabase.update(tableName, values, where, items);
+	public long updataDatabasesData(String tableName, ContentValues values, String where) {
+		mSQLiteDatabase = mDatabaseHelper.getWritableDatabase();
+		changeItemNum = mSQLiteDatabase.update(tableName, values, where, null);
+		mSQLiteDatabase.close();
+		Log.e(TAG, "updataDatabasesData succeeded");
 		return changeItemNum;
-	}
-	
-	protected long deleteDatabasesData(String tableName, String where, String items[]) {
-		changeItemNum = mSQLiteDatabase.delete(tableName, where, items);
-		return changeItemNum;
-	}
-	
-	protected ArrayList<HashMap<String,Object>> queryDatabasesData(String items[]) {
-			Cursor cursor = mSQLiteDatabase.query("Book", null, null, null, null, null,
-					null);
-			return outCursor(cursor, items);
 	}
 
-	private ArrayList<HashMap<String,Object>> outCursor(Cursor cursor, String items[]) {
+	public long deleteDatabasesData(String tableName, String where) {
+		mSQLiteDatabase = mDatabaseHelper.getWritableDatabase();
+		changeItemNum = mSQLiteDatabase.delete(tableName, where, null);
+		mSQLiteDatabase.close();
+		Log.e(TAG, "deleteDatabasesData succeeded");
+		return changeItemNum;
+	}
+
+	public ArrayList<HashMap<String,Object>> queryDatabasesData(String tableName, String where, String items[]) {
+		mSQLiteDatabase = mDatabaseHelper.getWritableDatabase();
+		Cursor cursor = mSQLiteDatabase.query(tableName, items, where, null, null, null, null);
+		Log.e(TAG, "queryDatabasesData succeeded");
+		return outCursor(mSQLiteDatabase, cursor, items);
+	}
+
+	private ArrayList<HashMap<String,Object>> outCursor(SQLiteDatabase sqliteDatabase, Cursor cursor, String items[]) {
 		queryMap = new ArrayList<HashMap<String,Object>>();
 		if (cursor.moveToFirst()) {
-			dataMap = new HashMap<String, Object>();
 			do {
+				dataMap = new HashMap<String, Object>();
 				for(int i=0;i<items.length;i++){
 					dataMap.put(items[i], cursor.getString(cursor.getColumnIndex(items[i])).toString());
 				}
@@ -154,33 +173,29 @@ public class CollectorData {
 			} while (cursor.moveToNext());
 		}
 		cursor.close();
+		sqliteDatabase.close();
 		return queryMap;
 	}
-	
-	protected void replaceDatabasesData() {
+
+	public void replaceDatabasesData() {
+		mSQLiteDatabase = mDatabaseHelper.getWritableDatabase();
 		mSQLiteDatabase.beginTransaction();
 		try {
-			mSQLiteDatabase.delete("Book", null, null);
-//			if (true) {
-//				throw new NullPointerException();
-//			}
-			ContentValues values = new ContentValues();
-			values.put("name", "Game of Thrones");
-			values.put("author", "George Martin");
-			values.put("pages", 720);
-			values.put("price", 20.85);
-			mSQLiteDatabase.insert("Book", null, values);
+			/* 数据库事务模板 */
 			mSQLiteDatabase.setTransactionSuccessful();
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
 			mSQLiteDatabase.endTransaction();
 		}
+		mSQLiteDatabase.close();
+		Log.e(TAG, "replaceDatabasesData succeeded");
 	}
 
 }
 
 class DatabaseHelper extends SQLiteOpenHelper {
+	private final static String TAG = "DatabaseHelper";
 
 	public static final String CREATE_BOOK = "create table Book ("
 			+ "id integer primary key autoincrement, "
@@ -205,7 +220,7 @@ class DatabaseHelper extends SQLiteOpenHelper {
 	public void onCreate(SQLiteDatabase db) {
 		db.execSQL(CREATE_BOOK);
 		db.execSQL(CREATE_CATEGORY);
-		Toast.makeText(mContext, "Create succeeded", Toast.LENGTH_SHORT).show();
+		Log.e(TAG, "onCreate succeeded");
 	}
 
 	@Override
@@ -213,9 +228,9 @@ class DatabaseHelper extends SQLiteOpenHelper {
 		switch (oldVersion) {
 		case 1:
 			db.execSQL(CREATE_CATEGORY);
-			
+
 		default:
 		}
+		Log.e(TAG, "onUpgrade succeeded");
 	}
-
 }
