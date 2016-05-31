@@ -12,17 +12,6 @@ public class mainActivity extends CollectorActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.main);
-		URL url = null;
-		try {
-			url = new URL("http://zh.wikipedia.org/w/api.php");
-		} catch (MalformedURLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		CollectorClient cc= new CollectorClient(url);
-		cc.sendRequestWithHttpGETURLConnection();
-		cc.sendRequestWithHttpPOSTURLConnection("action=opensearch&search=Android");
 	}
 
 }
